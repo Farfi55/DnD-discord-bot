@@ -75,6 +75,14 @@ def find_complete(key: str) -> search_info:
     return s
 
 
+def get_all():
+    return zip(db.keys(), db.values())
+
+
+def get(key):
+    return find_first(key)
+
+
 def contains(key) -> bool:
     return find_complete(key).has_matches()
 

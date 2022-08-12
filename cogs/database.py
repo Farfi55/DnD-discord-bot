@@ -5,6 +5,7 @@ import db_utils
 
 class DataBaseComands(commands.Cog, name='Comandi DataBase'):
     ''''''
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -70,15 +71,56 @@ class DataBaseComands(commands.Cog, name='Comandi DataBase'):
         if not db_utils.contains(key):
             await utils.reply_with_err_msg(
                 ctx, f"non esiste nessuna chiave `{key}` nel database!\n" +
-                "puoi aggiungere un campo chiave-valore con `.db_add chiave valore`"
+                "puoi aggiungere un campo chiave-valore con `!db_add chiave valore`"
             )
             return
 
+        old_value = db_utils.get(key)
         if db_utils.set(key, value, create_on_missing=False):
             await utils.reply_with_success_msg(
-                ctx, f"modificato con successo il valore di `{key}`")
+                ctx, f"modificato con successo il valore di `{key}`,\nda: {old_value}\na: {value}")
 
-    @commands.command(name='db_get', aliases=['db_show'])
+    @commands.command(
+        name='db_append',
+        aliases=['db_appendi', "db_app"]
+    )
+    async def db_append(self, ctx, key, value):
+        ''' Appende del testo alla fine di un campo del database '''
+
+        if not db_utils.contains(key):
+            await utils.reply_with_err_msg(
+                ctx, f"non esiste nessuna chiave `{key}` nel database!\n" +
+                "puoi aggiungere un campo chiave-valore con `!db_add chiave valore`"
+            )
+            return
+
+        old_value = db_utils.get(key)
+        new_value = old_value + value
+        if db_utils.set(key, new_value, create_on_missing=False):
+            await utils.reply_with_success_msg(
+                ctx, f"modificato con successo il valore di `{key}`,\nda: {old_value}\na: {new_value}")
+
+    @commands.command(
+        name='db_append_start',
+        aliases=['db_appendi_inizio', "db_app_start"]
+    )
+    async def db_append_start(self, ctx, key, value):
+        ''' Appende del testo all'inizio di un campo del database '''
+
+        if not db_utils.contains(key):
+            await utils.reply_with_err_msg(
+                ctx, f"non esiste nessuna chiave `{key}` nel database!\n" +
+                "puoi aggiungere un campo chiave-valore con `!db_add chiave valore`"
+            )
+            return
+
+        old_value = db_utils.get(key)
+        new_value = value + old_value
+        if db_utils.set(key, new_value, create_on_missing=False):
+            await utils.reply_with_success_msg(
+                ctx, f"modificato con successo il valore di `{key}`,\nda: {old_value}\na: {new_value}")
+
+    @commands.command(name='db_get')
     async def db_get(self, ctx, key):
         ''' Mostra il valore di un campo del database '''
 
@@ -90,6 +132,54 @@ class DataBaseComands(commands.Cog, name='Comandi DataBase'):
         chiave, valore = db_utils.find_complete(key).get_first_match()
         await utils.reply_with_success_msg(
             ctx, f"il valore di `{chiave}` è `{valore}`")
+
+    @commands.command(name='db_list')
+    async def db_list(self, ctx, key=None):
+        ''' Mostra tutti i campi del database accettati dalla chiave (opzionale) '''
+
+        if key is None:
+            await utils.reply_with_msg(
+                ctx, f"\n```css\n"
+                "chiavi : valore\n"
+                "\n".join(
+                    [f"{chiave}: {valore}" for chiave,
+                        valore in db_utils.get_all()]
+                )
+            )
+            return
+
+        await utils.reply_with_msg(
+            ctx, f"\n```css\n"
+            "chiavi : valore\n"
+            "\n".join(
+                [f"{chiave}: {valore}" for chiave,
+                 valore in db_utils.find_all(key)]
+            )
+        )
+        return
+
+    @commands.command(name='db_keys')
+    async def db_keys(self, ctx, key=None):
+        ''' Mostra tutte le chiavi del database accettate dalla chiave (opzionale) '''
+
+        if key is None:
+            await utils.reply_with_msg(
+                ctx, f"\n```css\n"
+                "chiavi: \n"
+                "\n".join(
+                    [chiave for chiave, _ in db_utils.get_all()]
+                )
+            )
+            return
+
+        await utils.reply_with_msg(
+            ctx, f"\n```css\n"
+            "chiavi : valore\n"
+            ",\t".join(
+                [chiave for chiave, _ in db_utils.find_all(key)]
+            )
+        )
+        return
 
 
 def setup(bot):
