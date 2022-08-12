@@ -10,7 +10,7 @@ def d(facce=6, volte=1):
 
 
 async def reply_with_msg(ctx, message):
-    ctx.reply(content=message)
+    await ctx.send(message)
 
 
 async def reply_with_err_msg(ctx, message):

@@ -3,8 +3,8 @@ from replit import db
 KEY_PART_SEPARATOR = "."
 
 
-def split_key(key: str) -> list(str):
-    return key.split(KEY_PART_SEPARATOR)
+def split_key(key: str) -> list():
+    return key.split(sep=KEY_PART_SEPARATOR)
 
 
 class search_info:
@@ -26,63 +26,67 @@ class search_info:
         self.partial_match_depth = 0
 
     def has_matches(self) -> bool:
-        return self.get_n_matches > 0
+        return self.get_n_matches() > 0
 
     def has_multiple_matches(self) -> bool:
-        return self.get_n_matches > 1
+        return self.get_n_matches() > 1
 
     def get_n_key_components(self) -> int:
         return len(self.key_components)
 
     def get_n_matches(self) -> int:
-        return len(self.key_matches)
+        return len(self.matches)
 
     def get_first_match(self):
-        return self.key_matches[0] if self.has_matches() else None
+        return self.matches[0] if self.has_matches() else None
 
     def get_partial_key_str(self) -> str:
         return KEY_PART_SEPARATOR.join(self.partial_match_components)
 
 
-async def find_first(key: str):
+def find_first(key: str):
     """returns tuple (key, value) or None"""
 
-    s = await find(key, False)
+    s = find(key, False)
     return s.get_first_match()
 
 
-async def find_all(key: str):
+def find_all(key: str):
     """returns list of tuples (key, value)"""
 
-    s = await find(key, True)
+    s = find(key, True)
     return s.matches
 
 
-async def find(key: str, allow_multiple_matches=True) -> search_info:
-    s = search_info(key, allow_multiple_matches=allow_multiple_matches)
-    return await search(s)
+def find(key: str, allow_multiple_matches=True) -> search_info:
+    s = search_info(key=key,
+                    allow_multiple_matches=allow_multiple_matches,
+                    require_complete_key=False)
+    search(s)
+    return s
 
 
-async def find_complete(key: str) -> search_info:
-    s = search_info(key,
+def find_complete(key: str) -> search_info:
+    s = search_info(key=key,
                     allow_multiple_matches=False,
                     require_complete_key=True)
 
-    return search(s)
+    search(s)
+    return s
 
 
-async def contains(key) -> bool:
+def contains(key) -> bool:
     return find_complete(key).has_matches()
 
 
-async def search(s: search_info, db_level: dict = db):
+def search(s: search_info, db_level: dict = db):
     if s.partial_match_components:
-        await search_prefix_key(s, db_level)
+        search_prefix_key(s, db_level)
     else:
-        await search_full_key(s, db_level)
+        search_full_key(s, db_level)
 
 
-async def search_full_key(s: search_info, db_level: dict = db):
+def search_full_key(s: search_info, db_level: dict = db):
     """
     ricerca semplice, richiede la chiave al completo
     """
@@ -101,7 +105,7 @@ async def search_full_key(s: search_info, db_level: dict = db):
             s.matches.append((s.original_key, db_level[key]))
 
 
-async def search_prefix_key(s: search_info, db_level: dict = db):
+def search_prefix_key(s: search_info, db_level: dict = db):
     """ricerca con abbreviazioni, molto più complesso"""
 
     # la parte della chiave che dobbiamo cercare questa iterazione
@@ -116,11 +120,10 @@ async def search_prefix_key(s: search_info, db_level: dict = db):
                 # ripetiamo la ricerca a un livello più profondo
                 # NOTA BENE: stiamo chiamando la funzione search, all'interno di essa stessa
                 # questo concetto si chiama ricorsione
-                await search(s, db_level[db_key])
+                search(s, db_level[db_key])
             else:
                 # abbiamo trovato quello che cercavamo
-                s.matches.append(
-                    (s.get_partial_key_str(), db_level[db_key]))
+                s.matches.append((s.get_partial_key_str(), db_level[db_key]))
 
             s.partial_match_components.pop()
             s.partial_match_depth -= 1
