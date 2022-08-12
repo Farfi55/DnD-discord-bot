@@ -3,15 +3,14 @@ import utils
 import db_utils
 
 
-class DataBaseComands(commands.Cog, name='Comandi DataBase'):
+class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     ''''''
-
     def __init__(self, bot):
         self.bot = bot
 
     async def cog_check(self, ctx):
         '''controllo per i comandi di questa classe, se ritorna True, il comando può essere eseguito'''
-        return ctx.author.id in self.bot.owner_ids
+        return ctx.author.id == self.bot.author_id or ctx.author.id in self.bot.owner_ids
 
     @commands.command(  # Decorator to declare where a command is.
         name='db_add',  # Name of the command, defaults to function name.
@@ -78,12 +77,11 @@ class DataBaseComands(commands.Cog, name='Comandi DataBase'):
         old_value = db_utils.get(key)
         if db_utils.set(key, value, create_on_missing=False):
             await utils.reply_with_success_msg(
-                ctx, f"modificato con successo il valore di `{key}`,\nda: {old_value}\na: {value}")
+                ctx,
+                f"modificato con successo il valore di `{key}`,\nda: {old_value}\na: {value}"
+            )
 
-    @commands.command(
-        name='db_append',
-        aliases=['db_appendi', "db_app"]
-    )
+    @commands.command(name='db_append', aliases=['db_appendi', "db_app"])
     async def db_append(self, ctx, key, value):
         ''' Appende del testo alla fine di un campo del database '''
 
@@ -98,12 +96,12 @@ class DataBaseComands(commands.Cog, name='Comandi DataBase'):
         new_value = old_value + value
         if db_utils.set(key, new_value, create_on_missing=False):
             await utils.reply_with_success_msg(
-                ctx, f"modificato con successo il valore di `{key}`,\nda: {old_value}\na: {new_value}")
+                ctx,
+                f"modificato con successo il valore di `{key}`,\nda: {old_value}\na: {new_value}"
+            )
 
-    @commands.command(
-        name='db_append_start',
-        aliases=['db_appendi_inizio', "db_app_start"]
-    )
+    @commands.command(name='db_append_start',
+                      aliases=['db_appendi_inizio', "db_app_start"])
     async def db_append_start(self, ctx, key, value):
         ''' Appende del testo all'inizio di un campo del database '''
 
@@ -118,7 +116,9 @@ class DataBaseComands(commands.Cog, name='Comandi DataBase'):
         new_value = value + old_value
         if db_utils.set(key, new_value, create_on_missing=False):
             await utils.reply_with_success_msg(
-                ctx, f"modificato con successo il valore di `{key}`,\nda: {old_value}\na: {new_value}")
+                ctx,
+                f"modificato con successo il valore di `{key}`,\nda: {old_value}\na: {new_value}"
+            )
 
     @commands.command(name='db_get')
     async def db_get(self, ctx, key):
@@ -141,21 +141,19 @@ class DataBaseComands(commands.Cog, name='Comandi DataBase'):
             await utils.reply_with_msg(
                 ctx, f"\n```css\n"
                 "chiavi : valore\n"
-                "\n".join(
-                    [f"{chiave}: {valore}" for chiave,
-                        valore in db_utils.get_all()]
-                )
-            )
+                "\n".join([
+                    f"{chiave}: {valore}"
+                    for chiave, valore in db_utils.get_all()
+                ]))
             return
 
         await utils.reply_with_msg(
             ctx, f"\n```css\n"
             "chiavi : valore\n"
-            "\n".join(
-                [f"{chiave}: {valore}" for chiave,
-                 valore in db_utils.find_all(key)]
-            )
-        )
+            "\n".join([
+                f"{chiave}: {valore}"
+                for chiave, valore in db_utils.find_all(key)
+            ]))
         return
 
     @commands.command(name='db_keys')
@@ -166,21 +164,15 @@ class DataBaseComands(commands.Cog, name='Comandi DataBase'):
             await utils.reply_with_msg(
                 ctx, f"\n```css\n"
                 "chiavi: \n"
-                "\n".join(
-                    [chiave for chiave, _ in db_utils.get_all()]
-                )
-            )
+                "\n".join([chiave for chiave, _ in db_utils.get_all()]))
             return
 
         await utils.reply_with_msg(
             ctx, f"\n```css\n"
             "chiavi : valore\n"
-            ",\t".join(
-                [chiave for chiave, _ in db_utils.find_all(key)]
-            )
-        )
+            ",\t".join([chiave for chiave, _ in db_utils.find_all(key)]))
         return
 
 
 def setup(bot):
-    bot.add_cog(DataBaseComands(bot))
+    bot.add_cog(DataBaseCommands(bot))

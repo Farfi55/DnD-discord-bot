@@ -23,6 +23,7 @@ async def on_ready():  # When the bot is ready
     print(bot.user)  # Prints the bot's username and identifier
 
 
+"""
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
@@ -32,12 +33,13 @@ async def on_message(message):
 
     if "69" in words or "nice" in words:
         await message.channel.send("nice")
-
+"""
 
 extensions = [
     # Same name as it would be if you were importing it
     'cogs.example',
     'cogs.database',
+    'cogs.cleaning',
 ]
 
 if __name__ == '__main__':  # Ensures this is the file being ran
