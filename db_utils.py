@@ -3,17 +3,22 @@ from replit import db
 KEY_PART_SEPARATOR = "."
 
 
+def split_key(key:str) -> list(str):
+	return key.split(KEY_PART_SEPARATOR)
+
 class search_info:
     def __init__(self,
                  key: str,
                  allow_multiple_matches=True,
-                 require_complete_key=False) -> None:
+                 require_complete_key=False,
+				create_on_missing = False) -> None:
         self.original_key = key
-        self.key_components = key.split(KEY_PART_SEPARATOR)
+        self.key_components = split_key(key)
         # lista di tuple (chiave, valore)
         self.matches = list()
         self.allow_multiple_matches = allow_multiple_matches
         self.require_complete_key = require_complete_key
+        self.create_on_missing = create_on_missing
 
         self.partial_match_components = list()
         self.partial_match_depth = 0
@@ -66,15 +71,19 @@ async def search(s: search_info, db_level: dict = db):
     # ricerca semplice, richiede la chiave al completo
 
     if s.require_complete_key:
-        for key in s.key_components:
-            if key in db_level.keys():
-                s.partial_match_depth += 1
-                if s.partial_match_depth < s.get_n_key_components():
-                    db_level = db_level[key]
-                else:
-
-                    s.key_matches.append((db_level[key]))
-
+    	for key in s.key_components:
+        	if key not in db_level.keys():
+				if s.create_on_missing:
+					db_level[key] = {}
+				else:
+					return
+					
+            	s.partial_match_depth += 1
+            	if s.partial_match_depth < s.get_n_key_components():
+                	db_level = db_level[key]
+				else:
+                	s.key_matches.append((s.original_key, db_level[key]))
+				
     # ricerca con abbreviazioni, molto più complesso
     else:
         # la parte della chiave che
@@ -101,3 +110,10 @@ async def search(s: search_info, db_level: dict = db):
                 # e non ne vogliamo oltre
                 if s.has_matches() and not s.allow_multiple_matches:
                     return
+
+
+def set(key, value):
+	key_parts = split_key(key)
+	for key_part in key_parts:
+		
+		
