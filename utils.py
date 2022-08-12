@@ -25,3 +25,5 @@ async def reply_with_info_msg(ctx, message):
     await reply_with_msg(ctx, "🔵 info: " + message)
 
 
+async def reply_with_success_msg(ctx, message):
+    await reply_with_msg(ctx, "🟢 successo: " + message)
