@@ -7,12 +7,10 @@ bot = commands.Bot(
     case_insensitive=True  # Commands aren't case-sensitive
 )
 
-# bot.author_id = 185258590901239808  # Change to your discord id!!!
-bot.owner_ids = [
-    185258590901239808,  # farfi
-    219921156591976450,  # nico
-    418443872335560714,  # edoardo
-]
+
+def set_owner_ids():
+    ids_raw = os.environ.get("OWNERS_IDS")
+    bot.owner_ids = ids_raw.split(",")
 
 
 @bot.event
