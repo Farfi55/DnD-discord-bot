@@ -23,3 +23,5 @@ async def reply_with_warn_msg(ctx, message):
 
 async def reply_with_info_msg(ctx, message):
     await reply_with_msg(ctx, "🔵 info: " + message)
+
+

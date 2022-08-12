@@ -9,8 +9,10 @@ bot = commands.Bot(
 
 
 def set_owner_ids():
-    ids_raw = os.environ.get("OWNERS_IDS")
-    bot.owner_ids = ids_raw.split(",")
+    raw_str_ids = os.environ.get("OWNERS_IDS")
+    str_ids = raw_str_ids.split(",")
+    ids = [int(id) for id in str_ids]
+    bot.owner_ids = ids
 
 
 @bot.event
@@ -26,6 +28,7 @@ extensions = [
 ]
 
 if __name__ == '__main__':  # Ensures this is the file being ran
+    set_owner_ids()
     for extension in extensions:
         bot.load_extension(extension)  # Loades every extension.
 

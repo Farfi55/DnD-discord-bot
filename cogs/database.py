@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
-from replit import db
-from auth import autentifica
+import db_utils 
 
 
 class DataBaseComands(commands.Cog, name='Comandi DataBase'):
@@ -13,7 +12,7 @@ class DataBaseComands(commands.Cog, name='Comandi DataBase'):
         '''
 		controllo per i comandi di questa classe, se ritorna True, il comando può essere eseguito
 		'''
-        return autentifica(ctx)
+        return ctx.author.id in bot.owner_ids
 
     @commands.command(  # Decorator to declare where a command is.
         name='dbadd',  # Name of the command, defaults to function name.
@@ -23,6 +22,10 @@ class DataBaseComands(commands.Cog, name='Comandi DataBase'):
         '''
 		Aggiunge un campo
 		'''
+		if(db_utils.contains(key)):
+			
+		
+		db[key] = value
 
     @commands.command(name="unload", aliases=['ul'])
     async def unload(self, ctx, cog):
