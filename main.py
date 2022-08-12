@@ -23,8 +23,8 @@ async def on_ready():  # When the bot is ready
 
 extensions = [
     # Same name as it would be if you were importing it
-    'cogs.cog_example'
-    'cogs.cog_database'
+    'cogs.example_cogs'
+    'cogs.database'
 ]
 
 if __name__ == '__main__':  # Ensures this is the file being ran

@@ -1,4 +1,3 @@
-from typing import Any
 from replit import db
 
 KEY_PART_SEPARATOR = "."
