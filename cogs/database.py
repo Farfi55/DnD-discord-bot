@@ -74,7 +74,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
             )
             return
 
-        old_value = db_utils.get(key)
+        _, old_value = db_utils.get(key)
         if db_utils.set(key, value, create_on_missing=False):
             await utils.reply_with_success_msg(
                 ctx,
@@ -92,7 +92,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
             )
             return
 
-        old_value = db_utils.get(key)
+        _, old_value = db_utils.get(key)
         new_value = old_value + value
         if db_utils.set(key, new_value, create_on_missing=False):
             await utils.reply_with_success_msg(
@@ -112,7 +112,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
             )
             return
 
-        old_value = db_utils.get(key)
+        _, old_value = db_utils.get(key)
         new_value = value + old_value
         if db_utils.set(key, new_value, create_on_missing=False):
             await utils.reply_with_success_msg(
@@ -139,21 +139,17 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
 
         if key is None:
             await utils.reply_with_msg(
-                ctx, f"\n```css\n"
-                "chiavi : valore\n"
-                "\n".join([
+                ctx, f"\n```css\n" + "chiavi : valore\n" + "\n".join([
                     f"{chiave}: {valore}"
                     for chiave, valore in db_utils.get_all()
-                ]))
+                ]) + "```")
             return
 
         await utils.reply_with_msg(
-            ctx, f"\n```css\n"
-            "chiavi : valore\n"
-            "\n".join([
+            ctx, f"\n```css\n" + "chiavi : valore\n" + "\n".join([
                 f"{chiave}: {valore}"
                 for chiave, valore in db_utils.find_all(key)
-            ]))
+            ]) + "```")
         return
 
     @commands.command(name='db_keys')
@@ -162,15 +158,15 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
 
         if key is None:
             await utils.reply_with_msg(
-                ctx, f"\n```css\n"
-                "chiavi: \n"
-                "\n".join([chiave for chiave, _ in db_utils.get_all()]))
+                ctx, f"```css\n" + "chiavi: \n" +
+                "\n".join([chiave
+                           for chiave, _ in db_utils.get_all()]) + "```")
             return
 
         await utils.reply_with_msg(
-            ctx, f"\n```css\n"
-            "chiavi : valore\n"
-            ",\t".join([chiave for chiave, _ in db_utils.find_all(key)]))
+            ctx, f"\n```css\n" + "chiavi : valore\n" +
+            ",\t".join([chiave
+                        for chiave, _ in db_utils.find_all(key)]) + "```")
         return
 
 
