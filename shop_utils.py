@@ -55,10 +55,11 @@ def buy_item(shop_name: str, item: str):
 
     if item in avariable_items:
         db_utils.get()
-
+        return True
     else:
-        raise ItemNotFound
+        return False
+        # raise ItemNotFound
 
 
-class ItemNotFound(Exception):
-    pass
+# class ItemNotFound(Exception):
+#     pass
