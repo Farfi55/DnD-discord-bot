@@ -7,6 +7,10 @@ def split_key(key: str) -> list():
     return key.split(sep=KEY_PART_SEPARATOR)
 
 
+def join_key(*key_parts) -> list():
+    return KEY_PART_SEPARATOR.join(key_parts)
+
+
 class search_info:
     def __init__(self,
                  key: str,
@@ -140,6 +144,10 @@ def search_prefix_key(s: search_info, db_level: dict = db):
             # e non ne vogliamo oltre
             if s.has_matches() and not s.allow_multiple_matches:
                 return
+
+
+def add(full_key, value):
+    set(full_key, value, True)
 
 
 def set(full_key, value, create_on_missing=False):
