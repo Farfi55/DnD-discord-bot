@@ -1,10 +1,11 @@
 from discord.ext import commands
-import utils
+import feedback
 import db_utils
 
 
 class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     ''''''
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -19,13 +20,13 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     async def db_add(self, ctx, key, value):
         ''' Aggiunge un campo ad database '''
         if db_utils.contains(key):
-            await utils.reply_with_err_msg(
+            await feedback.reply_with_err_msg(
                 ctx, f"esiste già una chiave `{key}` nel database!\n" +
                 "puoi modificare il suo valore con `!db_mod`")
             return
 
         if db_utils.set(key, value, create_on_missing=True):
-            await utils.reply_with_success_msg(
+            await feedback.reply_with_success_msg(
                 ctx,
                 f"aggiunto con successo al database la coppia chiave, valore:\n`{key}`: `{value}`"
             )
@@ -37,13 +38,13 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     async def db_add_sub(self, ctx, key):
         ''' Aggiunge una categoria ad database '''
         if db_utils.contains(key):
-            await utils.reply_with_err_msg(
+            await feedback.reply_with_err_msg(
                 ctx, f"esiste già una chiave `{key}` nel database!\n" +
                 "puoi modificare il suo valore con `!db_mod`")
             return
 
         if db_utils.set(key, dict(), create_on_missing=True):
-            await utils.reply_with_success_msg(
+            await feedback.reply_with_success_msg(
                 ctx,
                 f"aggiunto con successo al database la sotto cartella `{key}`")
 
@@ -52,12 +53,12 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
         ''' Rimuove un campo dal database '''
 
         if not db_utils.contains(key):
-            await utils.reply_with_err_msg(
+            await feedback.reply_with_err_msg(
                 ctx, f"non esiste nessuna chiave `{key}` nel database!")
             return
 
         if db_utils.remove(key):
-            await utils.reply_with_success_msg(
+            await feedback.reply_with_success_msg(
                 ctx, f"rimosso con successo dal database `{key}`")
 
     @commands.command(
@@ -68,7 +69,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
         ''' Modifica il valore di un campo del database '''
 
         if not db_utils.contains(key):
-            await utils.reply_with_err_msg(
+            await feedback.reply_with_err_msg(
                 ctx, f"non esiste nessuna chiave `{key}` nel database!\n" +
                 "puoi aggiungere un campo chiave-valore con `!db_add chiave valore`"
             )
@@ -76,7 +77,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
 
         _, old_value = db_utils.get(key)
         if db_utils.set(key, value, create_on_missing=False):
-            await utils.reply_with_success_msg(
+            await feedback.reply_with_success_msg(
                 ctx,
                 f"modificato con successo il valore di `{key}`,\nda: {old_value}\na: {value}"
             )
@@ -86,7 +87,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
         ''' Appende del testo alla fine di un campo del database '''
 
         if not db_utils.contains(key):
-            await utils.reply_with_err_msg(
+            await feedback.reply_with_err_msg(
                 ctx, f"non esiste nessuna chiave `{key}` nel database!\n" +
                 "puoi aggiungere un campo chiave-valore con `!db_add chiave valore`"
             )
@@ -95,7 +96,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
         _, old_value = db_utils.get(key)
         new_value = old_value + value
         if db_utils.set(key, new_value, create_on_missing=False):
-            await utils.reply_with_success_msg(
+            await feedback.reply_with_success_msg(
                 ctx,
                 f"modificato con successo il valore di `{key}`,\nda: {old_value}\na: {new_value}"
             )
@@ -106,7 +107,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
         ''' Appende del testo all'inizio di un campo del database '''
 
         if not db_utils.contains(key):
-            await utils.reply_with_err_msg(
+            await feedback.reply_with_err_msg(
                 ctx, f"non esiste nessuna chiave `{key}` nel database!\n" +
                 "puoi aggiungere un campo chiave-valore con `!db_add chiave valore`"
             )
@@ -115,7 +116,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
         _, old_value = db_utils.get(key)
         new_value = value + old_value
         if db_utils.set(key, new_value, create_on_missing=False):
-            await utils.reply_with_success_msg(
+            await feedback.reply_with_success_msg(
                 ctx,
                 f"modificato con successo il valore di `{key}`,\nda: {old_value}\na: {new_value}"
             )
@@ -125,12 +126,12 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
         ''' Mostra il valore di un campo del database '''
 
         if not db_utils.contains(key):
-            await utils.reply_with_err_msg(
+            await feedback.reply_with_err_msg(
                 ctx, f"non esiste nessuna chiave `{key}` nel database!")
             return
 
         chiave, valore = db_utils.find_complete(key).get_first_match()
-        await utils.reply_with_success_msg(
+        await feedback.reply_with_success_msg(
             ctx, f"il valore di `{chiave}` è `{valore}`")
 
     @commands.command(name='db_list')
@@ -138,14 +139,14 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
         ''' Mostra tutti i campi del database accettati dalla chiave (opzionale) '''
 
         if key is None:
-            await utils.reply_with_msg(
+            await feedback.reply_with_msg(
                 ctx, f"\n```css\n" + "chiavi : valore\n" + "\n".join([
                     f"{chiave}: {valore}"
                     for chiave, valore in db_utils.get_all()
                 ]) + "```")
             return
 
-        await utils.reply_with_msg(
+        await feedback.reply_with_msg(
             ctx, f"\n```css\n" + "chiavi : valore\n" + "\n".join([
                 f"{chiave}: {valore}"
                 for chiave, valore in db_utils.find_all(key)
@@ -157,13 +158,13 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
         ''' Mostra tutte le chiavi del database accettate dalla chiave (opzionale) '''
 
         if key is None:
-            await utils.reply_with_msg(
+            await feedback.reply_with_msg(
                 ctx, f"```css\n" + "chiavi: \n" +
                 "\n".join([chiave
                            for chiave, _ in db_utils.get_all()]) + "```")
             return
 
-        await utils.reply_with_msg(
+        await feedback.reply_with_msg(
             ctx, f"\n```css\n" + "chiavi : valore\n" +
             ",\t".join([chiave
                         for chiave, _ in db_utils.find_all(key)]) + "```")

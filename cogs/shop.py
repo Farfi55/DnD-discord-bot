@@ -18,7 +18,7 @@ import db_utils
 import utils
 
 
-class ShopCommads(commands.Cog, name='Comandi mercati'):
+class ShopCommands(commands.Cog, name='Comandi mercati'):
     ''''''
 
     lvl1 = "lvl1"
@@ -64,7 +64,8 @@ class ShopCommads(commands.Cog, name='Comandi mercati'):
         Manda in privato la lista degli oggetti nel mercato
         '''
 
-        # todo: verificare lvl utente dal database
+        if(not await self.authorize_shop_access(ctx, shop_name)):
+            return
 
         shop_items = await self.bot.db.get_shop_items(shop_name)
         if not shop_items:
