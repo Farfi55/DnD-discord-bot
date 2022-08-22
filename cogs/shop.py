@@ -69,24 +69,25 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
         if (not await self.authorize_shop_access(ctx, shop_name)):
             return
 
-        shop_items = await shop_utils.get_shop_items(shop_name)
-        if not shop_items:
+        shop_items = shop_utils.get_shop_items(shop_name)
+        if shop_items == None:
             await feedback.reply_with_err_msg(
-                ctx, f"il mercato {shop_name} non esiste!")
+                ctx, f"il mercato {shop_name} non esiste")
             return
 
-        msg = f"oggetti del mercato {shop_name}:\n"
+        msg = f"oggetti del mercato {shop_name}:\n```css\n"
         msg += "\n".join(shop_items)
+        msg += "```"
 
-        await feedback.private_reply_with_success_msg(ctx, msg, self.bot)
+        await feedback.private_reply_with_success_msg(ctx, msg)
         await feedback.reply_with_success_msg(
             ctx, "lista degli item inviata nei messaggi privati")
 
     async def authorize_shop_access(self, ctx, shop_name) -> bool:
         full_user_key = db_utils.join_key("users", str(ctx.author.id),
                                           "shop_lvl")
-        user_shop_lvl = db_utils.get(full_user_key)
-
+        unused_key, user_shop_lvl = db_utils.get(full_user_key)
+        print(user_shop_lvl)
         if user_shop_lvl == None:
             await feedback.reply_with_err_msg(
                 ctx, f"non sei registrato a nessun livello!")
@@ -106,7 +107,7 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
     async def set_user_shop_lvl(self, ctx, shop_lvl):
         full_user_key = db_utils.join_key("users", str(ctx.author.id),
                                           "shop_lvl")
-        db_utils.set(full_user_key, shop_lvl)
+        db_utils.set(full_user_key, shop_lvl, True)
         await feedback.reply_with_success_msg(
             ctx, f"Ora {ctx.author} vive a {shop_lvl}")
 

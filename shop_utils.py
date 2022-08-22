@@ -15,10 +15,14 @@ def get_full_item_key(shop_name: str, item_name: str) -> str:
 
 def get_shop_items(shop_name: str):
     key = db_utils.join_key(shop_key, shop_name)
-    search = db_utils.search_info(key, False, True, True)
-    (key, shop_dict) = db_utils.search_full_key(search)
 
-    return shop_dict
+    search_res = db_utils.find_complete(key)
+
+    if search_res.has_matches():
+        return search_res.get_first_match()[1]
+    else:
+        print(f"{key} not found in db")
+        return None
 
 
 def get_shop_items_avariable(shop_name: str) -> list():
