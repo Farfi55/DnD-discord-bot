@@ -14,7 +14,9 @@ def get_full_item_key(shop_name: str, item_name: str) -> str:
 
 
 def get_shop_items(shop_name: str) -> dict(str, str):
-    return db_utils.search_full_key(shop_key, db_utils.join_key(shop_key, shop_name))
+    (key, shop_dict) = db_utils.search_full_key(
+        db_utils.join_key(shop_key, shop_name))
+    return shop_dict
 
 
 def get_shop_items_avariable(shop_name: str) -> list(str):
