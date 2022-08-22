@@ -13,7 +13,7 @@ def get_full_item_key(shop_name: str, item_name: str) -> str:
     return db_utils.join_key(shop_key, shop_name, item_name)
 
 
-def get_shop_items(shop_name: str) -> dict(str, str):
+def get_shop_items(shop_name: str):
     key = db_utils.join_key(shop_key, shop_name)
     search = db_utils.search_info(key, False, True, True)
     (key, shop_dict) = db_utils.search_full_key(search)
@@ -21,7 +21,7 @@ def get_shop_items(shop_name: str) -> dict(str, str):
     return shop_dict
 
 
-def get_shop_items_avariable(shop_name: str) -> list(str):
+def get_shop_items_avariable(shop_name: str) -> list():
     avariable_items = list()
     for item_key, item_data in get_shop_items(shop_name):
         if avariable_indicator in item_data:
@@ -30,7 +30,7 @@ def get_shop_items_avariable(shop_name: str) -> list(str):
     return avariable_items
 
 
-def get_shop_items_unavariable(shop_name: str) -> list(str):
+def get_shop_items_unavariable(shop_name: str) -> list():
     unavariable_items = list()
     for item_key, item_data in get_shop_items(shop_name):
         if unavariable_indicator in item_data:
