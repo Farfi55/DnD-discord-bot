@@ -40,6 +40,7 @@ extensions = [
     'cogs.example',
     'cogs.database',
     'cogs.cleaning',
+    'cogs.shop',
 ]
 
 if __name__ == '__main__':  # Ensures this is the file being ran
