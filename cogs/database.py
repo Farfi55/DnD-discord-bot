@@ -142,7 +142,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
             await feedback.reply_with_msg(
                 ctx, f"\n```css\n" + "chiavi : valore\n" + "\n".join([
                     f"{chiave}: {valore}"
-                    for chiave, valore in db_utils.get_all()
+                    for (chiave, valore) in db_utils.get_all()
                 ]) + "```")
             return
 

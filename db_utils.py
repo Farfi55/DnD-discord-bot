@@ -80,11 +80,16 @@ def find_complete(key: str) -> search_info:
 
 
 def get_all():
-    return zip(db.keys(), db.values())
+    return [get(key) for key in db.keys()]
 
 
 def get(key):
-    return find_first(key)
+    s = search_info(key,
+                    allow_multiple_matches=False,
+                    require_complete_key=True,
+                    create_on_missing=False)
+    search(s)
+    return s.get_first_match()
 
 
 def contains(key) -> bool:
