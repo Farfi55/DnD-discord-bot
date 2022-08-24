@@ -19,6 +19,7 @@ def get_shop_items(shop_name: str):
     search_res = db_utils.find_complete(key)
 
     if search_res.has_matches():
+        # ritorna un dizionario di item - valori
         return search_res.get_first_match()[1]
     else:
         print(f"{key} not found in db")
@@ -27,19 +28,21 @@ def get_shop_items(shop_name: str):
 
 def get_shop_items_avariable(shop_name: str) -> list():
     avariable_items = list()
-    for item_key, item_data in get_shop_items(shop_name):
+    for item_name in get_shop_items(shop_name):
+        item_key = get_full_item_key(shop_name, item_name)
+        item_data = db_utils.get(item_key)
         if avariable_indicator in item_data:
-            item = item_key.removeprefix(f"{shop_key}.{shop_name}.")
-            avariable_items.append(item)
+            avariable_items.append(item_name)
     return avariable_items
 
 
 def get_shop_items_unavariable(shop_name: str) -> list():
     unavariable_items = list()
-    for item_key, item_data in get_shop_items(shop_name):
+    for item_name in get_shop_items(shop_name):
+        item_key = get_full_item_key(shop_name, item_name)
+        item_data = db_utils.get(item_key)
         if unavariable_indicator in item_data:
-            item = item_key.removeprefix(f"{shop_key}.{shop_name}.")
-            unavariable_items.append(item)
+            unavariable_items.append(item_name)
     return unavariable_items
 
 
@@ -62,7 +65,11 @@ def buy_item(shop_name: str, item: str):
     avariable_items = get_shop_items_avariable(shop_name)
 
     if item in avariable_items:
-        db_utils.get()
+        item_key = get_full_item_key(shop_name, item)
+        (_, item_data) = db_utils.get(item_key)
+        item_data = item_data.replace(avariable_indicator,
+                                      unavariable_indicator)
+        db_utils.set(item_key, item_data)
         return True
     else:
         return False

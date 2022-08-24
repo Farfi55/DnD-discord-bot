@@ -69,15 +69,22 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
         if (not await self.authorize_shop_access(ctx, shop_name)):
             return
 
-        shop_items = shop_utils.get_shop_items(shop_name)
-        if shop_items == None:
+        shop_items_avariable = shop_utils.get_shop_items_avariable(shop_name)
+        if shop_items_avariable == None:
             await feedback.reply_with_err_msg(
                 ctx, f"il mercato {shop_name} non esiste")
             return
+        shop_items_unavariable = shop_utils.get_shop_items_unavariable(
+            shop_name)
 
-        msg = f"oggetti del mercato {shop_name}:\n```css\n"
-        msg += "\n".join(shop_items)
+        msg = f"oggetti disponibili del mercato {shop_name}:\n```css\n"
+        msg += "\n".join(shop_items_avariable)
         msg += "```"
+
+        if len(shop_items_avariable) > 0:
+            msg += f"\noggetti non disponibili del mercato {shop_name}:\n```css\n"
+            msg += "\n".join(shop_items_unavariable)
+            msg += "```"
 
         await feedback.private_reply_with_success_msg(ctx, msg)
         await feedback.reply_with_success_msg(
@@ -119,10 +126,10 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
     @commands.command(name="compra", alias=["buy"])
     async def buy_item(self, ctx, shop_name, item_name):
         if (shop_utils.buy_item(shop_name, item_name)):
-            feedback.reply_with_success_msg(
-                f"Hai comprato {item_name} da {shop_name}!")
+            await feedback.reply_with_success_msg(
+                ctx, f"Hai comprato {item_name} da {shop_name}!")
         else:
-            feedback.reply_with_err_msg(
+            await feedback.reply_with_err_msg(
                 ctx,
                 f"{item_name} non è presente dentro {shop_name} o non è disponibile"
             )
