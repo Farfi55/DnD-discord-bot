@@ -8,7 +8,13 @@ success_msg_prefix = "🟢 successo: "
 
 
 async def reply_with_msg(ctx, message):
-    await ctx.send(message)
+    chunklength = 2000
+    msg_chunks = [
+        message[i:i + chunklength] for i in range(0, len(message), chunklength)
+    ]
+
+    for msg_chunk in msg_chunks:
+        await ctx.send(msg_chunk)
 
 
 async def private_reply_with_msg(ctx, message):

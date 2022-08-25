@@ -30,10 +30,11 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
     lvl3 = "lvl3"
 
     breacher = "breacher"
-    extra1 = "EXTRA 1"
-    extra2 = "EXTRA 2"
+    commom_chest = "common_chest"
+    uncommon_chest = "uncommon_chest"
+    rare_chest = "rare_chest"
 
-    lvl1_shops = [lvl1, breacher, extra1, extra2]
+    lvl1_shops = [lvl1, breacher, commom_chest, uncommon_chest, rare_chest]
     lvl2_shops = [lvl2, *lvl1_shops]
     lvl3_shops = [lvl3, *lvl2_shops]
 
@@ -58,7 +59,63 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="breacher")
     async def get_breacher_shop_items(self, ctx):
-        await self.get_shop_items(ctx, self.breacher)
+        random_items = shop_utils.get_random_shop_items(
+            "breacher", 10)
+        if random_items == None:
+            await feedback.reply_with_err_msg(
+                ctx, f"non è stato possibile prendere gli item dal breacher")
+            return
+
+        msg = "Items del breacher\n```css\n"
+        msg += "\n".join(random_items)
+        msg += "\n```"
+        await feedback.reply_with_success_msg(ctx, msg)
+
+    @commands.command(name="common_chest", alias=["ComChest"])
+    async def get_common_chest_items(self, ctx):
+        random_items = shop_utils.get_random_shop_items(
+            "common_chest", 3)
+        if random_items == None:
+            await feedback.reply_with_err_msg(
+                ctx,
+                f"non è stato possibile prendere gli item dalla cassa comune")
+            return
+
+        msg = "Items della cassa comune\n```css\n"
+        msg += "\n".join(random_items)
+        msg += "\n```"
+        await feedback.reply_with_success_msg(ctx, msg)
+
+    @commands.command(name="uncommon_chest", alias=["UncChest"])
+    async def get_uncommon_chest_items(self, ctx):
+        random_items = shop_utils.get_random_shop_items(
+            "uncommon_chest", 3)
+        if random_items == None:
+            await feedback.reply_with_err_msg(
+                ctx,
+                f"non è stato possibile prendere gli item dalla cassa non comune"
+            )
+            return
+
+        msg = "Items dalla cassa non comune\n```css\n"
+        msg += "\n".join(random_items)
+        msg += "\n```"
+        await feedback.reply_with_success_msg(ctx, msg)
+
+    @commands.command(name="rare_chest", alias=["RarChest"])
+    async def get_rare_chest_items(self, ctx):
+        random_items = shop_utils.get_random_shop_items(
+            "rare_chest", 10)
+        if random_items == None:
+            await feedback.reply_with_err_msg(
+                ctx,
+                f"non è stato possibile prendere gli item dalla cassa rara")
+            return
+
+        msg = "Items della cassa rara\n```css\n"
+        msg += "\n".join(random_items)
+        msg += "\n```"
+        await feedback.reply_with_success_msg(ctx, msg)
 
     @commands.command(name="mercato", alias=["shop", "market"])
     async def get_shop_items(self, ctx, shop_name):

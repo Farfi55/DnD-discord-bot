@@ -5,7 +5,6 @@ import db_utils
 
 class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     ''''''
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -138,37 +137,30 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     async def db_list(self, ctx, key=None):
         ''' Mostra tutti i campi del database accettati dalla chiave (opzionale) '''
 
+        msg = "chiavi : tipo(valore)\n```css\n"
         if key is None:
-            await feedback.reply_with_msg(
-                ctx, f"\n```css\n" + "chiavi : valore\n" + "\n".join([
-                    f"{chiave}: {valore}"
-                    for (chiave, valore) in db_utils.get_all()
-                ]) + "```")
-            return
+            list_res = db_utils.get_all()
+        else:
+            list_res = db_utils.find_all(key)
 
-        await feedback.reply_with_msg(
-            ctx, f"\n```css\n" + "chiavi : valore\n" + "\n".join([
-                f"{chiave}: {valore}"
-                for chiave, valore in db_utils.find_all(key)
-            ]) + "```")
-        return
+        msg += "\n".join(
+            [f"{chiave}: {type(valore)}" for chiave, valore in list_res])
+        msg += "```"
+
+        await feedback.reply_with_msg(ctx, msg)
 
     @commands.command(name='db_keys')
     async def db_keys(self, ctx, key=None):
         ''' Mostra tutte le chiavi del database accettate dalla chiave (opzionale) '''
+        msg = "chiavi\n```css\n"
 
         if key is None:
-            await feedback.reply_with_msg(
-                ctx, f"```css\n" + "chiavi: \n" +
-                "\n".join([chiave
-                           for chiave, _ in db_utils.get_all()]) + "```")
-            return
+            msg += "\n".join([db_utils.get_all().keys()])
+        else:
+            msg += "\n".join([db_utils.find_all(key).keys()])
+        msg += "\n```"
 
-        await feedback.reply_with_msg(
-            ctx, f"\n```css\n" + "chiavi : valore\n" +
-            ",\t".join([chiave
-                        for chiave, _ in db_utils.find_all(key)]) + "```")
-        return
+        await feedback.reply_with_msg(ctx, msg)
 
 
 def setup(bot):
