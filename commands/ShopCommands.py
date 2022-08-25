@@ -17,9 +17,9 @@
 # 🔴 indica acquistato
 
 from discord.ext import commands
-import shop_utils
-import db_utils
-import feedback
+import backend.shop as shop
+import backend.db as db
+import backend.feedback as feedback
 
 
 class ShopCommands(commands.Cog, name='Comandi mercati'):
@@ -59,7 +59,7 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="breacher")
     async def get_breacher_shop_items(self, ctx):
-        random_items = shop_utils.get_random_shop_items(
+        random_items = shop.get_random_shop_items(
             "breacher", 10)
         if random_items == None:
             await feedback.reply_with_err_msg(
@@ -73,7 +73,7 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="common_chest", alias=["ComChest"])
     async def get_common_chest_items(self, ctx):
-        random_items = shop_utils.get_random_shop_items(
+        random_items = shop.get_random_shop_items(
             "common_chest", 3)
         if random_items == None:
             await feedback.reply_with_err_msg(
@@ -88,7 +88,7 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="uncommon_chest", alias=["UncChest"])
     async def get_uncommon_chest_items(self, ctx):
-        random_items = shop_utils.get_random_shop_items(
+        random_items = shop.get_random_shop_items(
             "uncommon_chest", 3)
         if random_items == None:
             await feedback.reply_with_err_msg(
@@ -104,7 +104,7 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="rare_chest", alias=["RarChest"])
     async def get_rare_chest_items(self, ctx):
-        random_items = shop_utils.get_random_shop_items(
+        random_items = shop.get_random_shop_items(
             "rare_chest", 10)
         if random_items == None:
             await feedback.reply_with_err_msg(
@@ -126,12 +126,12 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
         if (not await self.authorize_shop_access(ctx, shop_name)):
             return
 
-        shop_items_avariable = shop_utils.get_shop_items_avariable(shop_name)
+        shop_items_avariable = shop.get_shop_items_avariable(shop_name)
         if shop_items_avariable == None:
             await feedback.reply_with_err_msg(
                 ctx, f"il mercato {shop_name} non esiste")
             return
-        shop_items_unavariable = shop_utils.get_shop_items_unavariable(
+        shop_items_unavariable = shop.get_shop_items_unavariable(
             shop_name)
 
         msg = f"oggetti disponibili del mercato {shop_name}:\n```css\n"
@@ -148,9 +148,9 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
             ctx, "lista degli item inviata nei messaggi privati")
 
     async def authorize_shop_access(self, ctx, shop_name) -> bool:
-        full_user_key = db_utils.join_key("users", str(ctx.author.id),
-                                          "shop_lvl")
-        unused_key, user_shop_lvl = db_utils.get(full_user_key)
+        full_user_key = db.join_key("users", str(ctx.author.id),
+                                    "shop_lvl")
+        unused_key, user_shop_lvl = db.get(full_user_key)
         print(user_shop_lvl)
         if user_shop_lvl == None:
             await feedback.reply_with_err_msg(
@@ -169,20 +169,20 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="imposta_casa")
     async def set_user_shop_lvl(self, ctx, shop_lvl):
-        full_user_key = db_utils.join_key("users", str(ctx.author.id),
-                                          "shop_lvl")
-        db_utils.set(full_user_key, shop_lvl, True)
+        full_user_key = db.join_key("users", str(ctx.author.id),
+                                    "shop_lvl")
+        db.set(full_user_key, shop_lvl, True)
         await feedback.reply_with_success_msg(
             ctx, f"Ora {ctx.author} vive a {shop_lvl}")
 
     @commands.command(name="rimpiazza", alias=["replace"])
     async def set_shop_items(self, ctx, shop_name, items):
-        shop_utils.clear_shop_items(shop_name)
-        shop_utils.add_shop_items_from_str(shop_name, items)
+        shop.clear_shop_items(shop_name)
+        shop.add_shop_items_from_str(shop_name, items)
 
     @commands.command(name="compra", alias=["buy"])
     async def buy_item(self, ctx, shop_name, item_name):
-        if (shop_utils.buy_item(shop_name, item_name)):
+        if (shop.buy_item(shop_name, item_name)):
             await feedback.reply_with_success_msg(
                 ctx, f"Hai comprato {item_name} da {shop_name}!")
         else:

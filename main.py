@@ -37,10 +37,10 @@ async def on_message(message):
 
 extensions = [
     # Same name as it would be if you were importing it
-    'cogs.example',
-    'cogs.database',
-    'cogs.cleaning',
-    'cogs.shop',
+    'Commands.DevCommands',
+    'Commands.DatabaseCommands',
+    'Commands.CleaningCommands',
+    'Commands.ShopCommands',
 ]
 
 if __name__ == '__main__':  # Ensures this is the file being ran

@@ -1,10 +1,11 @@
 from discord.ext import commands
-import feedback
-import db_utils
+import backend.feedback as feedback
+import backend.db as db
 
 
 class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     ''''''
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -18,13 +19,13 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     )
     async def db_add(self, ctx, key, value):
         ''' Aggiunge un campo ad database '''
-        if db_utils.contains(key):
+        if db.contains(key):
             await feedback.reply_with_err_msg(
                 ctx, f"esiste già una chiave `{key}` nel database!\n" +
                 "puoi modificare il suo valore con `!db_mod`")
             return
 
-        if db_utils.set(key, value, create_on_missing=True):
+        if db.set(key, value, create_on_missing=True):
             await feedback.reply_with_success_msg(
                 ctx,
                 f"aggiunto con successo al database la coppia chiave, valore:\n`{key}`: `{value}`"
@@ -36,13 +37,13 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     )
     async def db_add_sub(self, ctx, key):
         ''' Aggiunge una categoria ad database '''
-        if db_utils.contains(key):
+        if db.contains(key):
             await feedback.reply_with_err_msg(
                 ctx, f"esiste già una chiave `{key}` nel database!\n" +
                 "puoi modificare il suo valore con `!db_mod`")
             return
 
-        if db_utils.set(key, dict(), create_on_missing=True):
+        if db.set(key, dict(), create_on_missing=True):
             await feedback.reply_with_success_msg(
                 ctx,
                 f"aggiunto con successo al database la sotto cartella `{key}`")
@@ -51,12 +52,12 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     async def db_remove(self, ctx, key):
         ''' Rimuove un campo dal database '''
 
-        if not db_utils.contains(key):
+        if not db.contains(key):
             await feedback.reply_with_err_msg(
                 ctx, f"non esiste nessuna chiave `{key}` nel database!")
             return
 
-        if db_utils.remove(key):
+        if db.remove(key):
             await feedback.reply_with_success_msg(
                 ctx, f"rimosso con successo dal database `{key}`")
 
@@ -67,15 +68,15 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     async def db_modify(self, ctx, key, value):
         ''' Modifica il valore di un campo del database '''
 
-        if not db_utils.contains(key):
+        if not db.contains(key):
             await feedback.reply_with_err_msg(
                 ctx, f"non esiste nessuna chiave `{key}` nel database!\n" +
                 "puoi aggiungere un campo chiave-valore con `!db_add chiave valore`"
             )
             return
 
-        _, old_value = db_utils.get(key)
-        if db_utils.set(key, value, create_on_missing=False):
+        _, old_value = db.get(key)
+        if db.set(key, value, create_on_missing=False):
             await feedback.reply_with_success_msg(
                 ctx,
                 f"modificato con successo il valore di `{key}`,\nda: {old_value}\na: {value}"
