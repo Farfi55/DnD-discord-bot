@@ -1,4 +1,5 @@
 from replit import db
+import discord_helper
 
 KEY_PART_SEPARATOR = "."
 
@@ -7,7 +8,8 @@ def split_key(key: str) -> list():
     return key.split(sep=KEY_PART_SEPARATOR)
 
 
-def join_key(*key_parts) -> list():
+def join_key(ctx, *key_parts) -> list():
+    key_parts.insert(0, ctx.guild.id)
     return KEY_PART_SEPARATOR.join(key_parts)
 
 
@@ -79,12 +81,14 @@ def find_complete(key: str) -> search_info:
     return s
 
 
-def get_all():
-    return [get(key) for key in db.keys()]
+def get_all(key=None):
+    if key is None:
+        return db.items()
+    return find_all(key)
 
 
-def get(key):
-    s = search_info(key,
+def get(full_key):
+    s = search_info(full_key,
                     allow_multiple_matches=False,
                     require_complete_key=True,
                     create_on_missing=False)
@@ -92,8 +96,13 @@ def get(key):
     return s.get_first_match()
 
 
-def contains(key) -> bool:
-    return find_complete(key).has_matches()
+def get_value(full_key):
+    res = get(full_key)
+    return None if res is None else res[1]
+
+
+def contains(full_key) -> bool:
+    return find_complete(full_key).has_matches()
 
 
 def search(s: search_info, db_level: dict = db):
@@ -155,6 +164,13 @@ def add(full_key, value):
     set(full_key, value, True)
 
 
+def replace(full_key, to_replace: str, replace_with: str):
+
+    val = str(get_value(full_key))
+    val.replace(to_replace, replace_with)
+    set(full_key, val)
+
+
 def set(full_key, value, create_on_missing=False):
 
     db_level = db
@@ -162,21 +178,21 @@ def set(full_key, value, create_on_missing=False):
 
     assert len(key_components) > 0, "la chiave non può essere vuota"
 
-    for depth, key in enumerate(key_components):
-        if key not in db_level.keys():
+    for depth, full_key in enumerate(key_components):
+        if full_key not in db_level.keys():
             if create_on_missing:
                 if depth == len(key_components) - 1:
-                    db_level[key] = value
+                    db_level[full_key] = value
                 else:
-                    db_level[key] = {}
-                    db_level = db_level[key]
+                    db_level[full_key] = {}
+                    db_level = db_level[full_key]
             else:
                 return False
         else:
             if depth == len(key_components) - 1:
-                db_level[key] = value
+                db_level[full_key] = value
             else:
-                db_level = db_level[key]
+                db_level = db_level[full_key]
     return True
 
 
@@ -195,3 +211,15 @@ def remove(full_key):
             else:
                 db_level = db_level[key]
     return True
+
+
+def move(full_key, new_full_key):
+    val = get_value(full_key)
+    if val is None:
+        return False
+    elif not set(new_full_key, val):
+        return False
+    elif not remove(full_key):
+        return False
+    else:
+        return True
