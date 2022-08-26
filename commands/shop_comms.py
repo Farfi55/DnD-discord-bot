@@ -21,24 +21,24 @@ import backend.shop as shop
 import backend.db as db
 import backend.feedback as feedback
 
+lvl1 = "lvl1"
+lvl2 = "lvl2"
+lvl3 = "lvl3"
+
+breacher = "breacher"
+commom_chest = "common_chest"
+uncommon_chest = "uncommon_chest"
+rare_chest = "rare_chest"
+
+lvl1_shops = [lvl1, breacher, commom_chest, uncommon_chest, rare_chest]
+lvl2_shops = [lvl2, *lvl1_shops]
+lvl3_shops = [lvl3, *lvl2_shops]
+
+unavaliable_on_buy_shops = [lvl1, lvl2, lvl3]
+
 
 class ShopCommands(commands.Cog, name='Comandi mercati'):
     ''''''
-
-    lvl1 = "lvl1"
-    lvl2 = "lvl2"
-    lvl3 = "lvl3"
-
-    breacher = "breacher"
-    commom_chest = "common_chest"
-    uncommon_chest = "uncommon_chest"
-    rare_chest = "rare_chest"
-
-    lvl1_shops = [lvl1, breacher, commom_chest, uncommon_chest, rare_chest]
-    lvl2_shops = [lvl2, *lvl1_shops]
-    lvl3_shops = [lvl3, *lvl2_shops]
-
-    unavaliable_on_buy_shops = [lvl1, lvl2, lvl3]
 
     def __init__(self, bot):
         self.bot = bot
@@ -49,15 +49,15 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="lvl1")
     async def get_lvl1_shop_items(self, ctx):
-        await self.get_shop_items(ctx, self.lvl1)
+        await self.get_shop_items(ctx, lvl1)
 
     @commands.command(name="lvl2")
     async def get_lvl2_shop_items(self, ctx):
-        await self.get_shop_items(ctx, self.lvl2)
+        await self.get_shop_items(ctx, lvl2)
 
     @commands.command(name="lvl3")
     async def get_lvl3_shop_items(self, ctx):
-        await self.get_shop_items(ctx, self.lvl3)
+        await self.get_shop_items(ctx, lvl3)
 
     @commands.command(name="breacher")
     async def get_breacher_shop_items(self, ctx):
@@ -150,19 +150,20 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
             ctx, "lista degli item inviata nei messaggi privati")
 
     async def authorize_shop_access(self, ctx, shop_name) -> bool:
-        full_user_key = db.join_key(ctx, "utenti", str(ctx.author.id), "casa")
+        full_user_key = db.join_key(
+            ctx, "utenti", str(ctx.author.id), "shop_lvl")
 
-        user_shop_lvl = db.get_value(full_user_key)
-        print(user_shop_lvl)
+        (k, user_shop_lvl) = db.get(full_user_key)
+        print(k, user_shop_lvl)
         if user_shop_lvl == None:
             await feedback.reply_with_err_msg(
                 ctx, f"non sei registrato a nessun livello!")
             return False
-        if user_shop_lvl == self.lvl1 and shop_name in self.lvl1_shops:
+        if user_shop_lvl == lvl1 and shop_name in lvl1_shops:
             return True
-        elif user_shop_lvl == self.lvl2 and shop_name in self.lvl2_shops:
+        elif user_shop_lvl == lvl2 and shop_name in lvl2_shops:
             return True
-        elif user_shop_lvl == self.lvl3 and shop_name in self.lvl3_shops:
+        elif user_shop_lvl == lvl3 and shop_name in lvl3_shops:
             return True
         else:
             await feedback.reply_with_err_msg(
@@ -171,11 +172,15 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="imposta_casa")
     async def set_user_shop_lvl(self, ctx, shop_lvl):
-        full_user_key = db.join_key(ctx, "utenti", str(ctx.author.id),
-                                    "shop_lvl")
-        db.set(full_user_key, shop_lvl, True)
-        await feedback.reply_with_success_msg(
-            ctx, f"Ora {ctx.author} vive a {shop_lvl}")
+        full_user_key = db.join_key(
+            ctx, "utenti", str(ctx.author.id), "shop_lvl")
+        if db.set(full_user_key, shop_lvl, True):
+            await feedback.reply_with_success_msg(
+                ctx, f"Ora {ctx.author} vive a {shop_lvl}")
+        else:
+            await feedback.reply_with_err_msg(
+                ctx, f"non è stato possibile impostare il livello di {ctx.author}"
+            )
 
     @commands.command(name="rimpiazza", alias=["replace"])
     async def set_shop_items(self, ctx, shop_name, items):
@@ -184,7 +189,7 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="compra", alias=["buy"])
     async def buy_item(self, ctx, shop_name, item_name):
-        set_unavailable = shop_name in self.unavaliable_on_buy_shops
+        set_unavailable = shop_name in unavaliable_on_buy_shops
 
         if (shop.buy_item(ctx, shop_name, item_name, set_unavailable)):
             await feedback.reply_with_success_msg(
