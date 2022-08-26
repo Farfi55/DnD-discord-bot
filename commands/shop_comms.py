@@ -187,6 +187,8 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
     async def set_shop_items(self, ctx, shop_name, items):
         shop.clear_shop_items(ctx, shop_name)
         shop.add_shop_items_from_str(ctx, shop_name, items)
+        await feedback.reply_with_success_msg(
+            ctx, f"oggetti del mercato {shop_name} aggiornati")
 
     @commands.command(name="compra", alias=["buy"])
     async def buy_item(self, ctx, shop_name, item_name):
