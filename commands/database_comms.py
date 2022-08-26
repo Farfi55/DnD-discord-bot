@@ -117,7 +117,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
             )
 
     @commands.command(name='db_get')
-    async def db_get(self, ctx, key):
+    async def db_get(self, ctx, key=None):
         ''' Mostra il valore di un campo del database '''
         key = db.join_key(ctx, key)
 
@@ -126,9 +126,13 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
                 ctx, f"non esiste nessuna chiave `{key}` nel database!")
             return
 
-        chiave, valore = db.find_complete(key).get_first_match()
-        await feedback.reply_with_success_msg(
-            ctx, f"il valore di `{chiave}` è `{valore}`")
+        valore = db.get_value(key)
+        msg = "```css\n"
+        msg += f"-- chiave: {key}\n"
+        msg += f"-- valore: {valore}\n"
+        msg += "```"
+
+        await feedback.reply_with_success_msg(ctx, msg)
 
     @commands.command(name='db_list')
     async def db_list(self, ctx, key=None):

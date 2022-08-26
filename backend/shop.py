@@ -19,7 +19,7 @@ def get_full_item_key(ctx, shop_name: str, item_name: str) -> str:
 
 
 def get_shop_items(ctx, shop_name: str) -> dict():
-    key = get_full_shop_key(ctx, shop_key, shop_name)
+    key = get_full_shop_key(ctx, shop_name)
 
     search_res = db.find_complete(key)
 

@@ -39,7 +39,6 @@ unavaliable_on_buy_shops = [lvl1, lvl2, lvl3]
 
 class ShopCommands(commands.Cog, name='Comandi mercati'):
     ''''''
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -150,11 +149,12 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
             ctx, "lista degli item inviata nei messaggi privati")
 
     async def authorize_shop_access(self, ctx, shop_name) -> bool:
-        full_user_key = db.join_key(
-            ctx, "utenti", str(ctx.author.id), "shop_lvl")
+        full_user_key = db.join_key(ctx, "utenti", str(ctx.author.id),
+                                    "shop_lvl")
 
-        (k, user_shop_lvl) = db.get(full_user_key)
-        print(k, user_shop_lvl)
+        user_shop_lvl = db.get_value(full_user_key)
+        print(user_shop_lvl)
+
         if user_shop_lvl == None:
             await feedback.reply_with_err_msg(
                 ctx, f"non sei registrato a nessun livello!")
@@ -172,15 +172,15 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="imposta_casa")
     async def set_user_shop_lvl(self, ctx, shop_lvl):
-        full_user_key = db.join_key(
-            ctx, "utenti", str(ctx.author.id), "shop_lvl")
+        full_user_key = db.join_key(ctx, "utenti", str(ctx.author.id),
+                                    "shop_lvl")
         if db.set(full_user_key, shop_lvl, True):
             await feedback.reply_with_success_msg(
                 ctx, f"Ora {ctx.author} vive a {shop_lvl}")
         else:
             await feedback.reply_with_err_msg(
-                ctx, f"non è stato possibile impostare il livello di {ctx.author}"
-            )
+                ctx,
+                f"non è stato possibile impostare il livello di {ctx.author}")
 
     @commands.command(name="rimpiazza", alias=["replace"])
     async def set_shop_items(self, ctx, shop_name, items):
