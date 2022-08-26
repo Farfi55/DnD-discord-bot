@@ -88,7 +88,7 @@ def find_complete(key: str) -> search_info:
 def get_all(key=None):
     if key is None:
         return db.items()
-    return find_all(key)
+    return find_all(key + KEY_PART_SEPARATOR)
 
 
 def get(full_key):

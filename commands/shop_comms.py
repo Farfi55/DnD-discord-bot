@@ -61,23 +61,21 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="breacher")
     async def get_breacher_shop_items(self, ctx):
-        random_items = shop.get_random_shop_items(ctx,
-                                                  "breacher", 10)
+        random_items = shop.get_random_shop_items(ctx, "breacher", 10)
         if random_items == None:
             await feedback.reply_with_err_msg(
                 ctx, f"non è stato possibile prendere gli item dal breacher")
             return
 
         msg = "Items del breacher\n```css\n"
-        msg += "\n".join([f"{i}: {item}" for i,
-                         item in enumerate(random_items, start=1)])
+        msg += "\n".join(
+            [f"{i}: {item}" for i, item in enumerate(random_items, start=1)])
         msg += "\n```"
         await feedback.reply_with_success_msg(ctx, msg)
 
     @commands.command(name="common_chest", alias=["ComChest"])
     async def get_common_chest_items(self, ctx):
-        random_items = shop.get_random_shop_items(ctx,
-                                                  "common_chest", 3)
+        random_items = shop.get_random_shop_items(ctx, "common_chest", 3)
         if random_items == None:
             await feedback.reply_with_err_msg(
                 ctx,
@@ -85,15 +83,14 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
             return
 
         msg = "Items della cassa comune\n```css\n"
-        msg += "\n".join([f"{i+1}: {item}" for i,
-                         item in enumerate(random_items)])
+        msg += "\n".join(
+            [f"{i+1}: {item}" for i, item in enumerate(random_items)])
         msg += "\n```"
         await feedback.reply_with_success_msg(ctx, msg)
 
     @commands.command(name="uncommon_chest", alias=["UncChest"])
     async def get_uncommon_chest_items(self, ctx):
-        random_items = shop.get_random_shop_items(ctx,
-                                                  "uncommon_chest", 3)
+        random_items = shop.get_random_shop_items(ctx, "uncommon_chest", 3)
         if random_items == None:
             await feedback.reply_with_err_msg(
                 ctx,
@@ -102,15 +99,14 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
             return
 
         msg = "Items dalla cassa non comune\n```css\n"
-        msg += "\n".join([f"{i}: {item}" for i,
-                         item in enumerate(random_items, start=1)])
+        msg += "\n".join(
+            [f"{i}: {item}" for i, item in enumerate(random_items, start=1)])
         msg += "\n```"
         await feedback.reply_with_success_msg(ctx, msg)
 
     @commands.command(name="rare_chest", alias=["RarChest"])
     async def get_rare_chest_items(self, ctx):
-        random_items = shop.get_random_shop_items(ctx,
-                                                  "rare_chest", 10)
+        random_items = shop.get_random_shop_items(ctx, "rare_chest", 10)
         if random_items == None:
             await feedback.reply_with_err_msg(
                 ctx,
@@ -118,8 +114,8 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
             return
 
         msg = "Items della cassa rara\n```css\n"
-        msg += "\n".join([f"{i}: {item}" for i,
-                         item in enumerate(random_items, start=1)])
+        msg += "\n".join(
+            [f"{i}: {item}" for i, item in enumerate(random_items, start=1)])
         msg += "\n```"
         await feedback.reply_with_success_msg(ctx, msg)
 
@@ -137,8 +133,8 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
             await feedback.reply_with_err_msg(
                 ctx, f"il mercato {shop_name} non esiste")
             return
-        shop_items_unavariable = shop.get_shop_items_unavariable(ctx,
-                                                                 shop_name)
+        shop_items_unavariable = shop.get_shop_items_unavariable(
+            ctx, shop_name)
 
         msg = f"oggetti disponibili del mercato {shop_name}:\n```css\n"
         msg += "\n".join(shop_items_avariable)
@@ -154,10 +150,9 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
             ctx, "lista degli item inviata nei messaggi privati")
 
     async def authorize_shop_access(self, ctx, shop_name) -> bool:
-        full_user_key = db.join_key(ctx, "users", str(ctx.author.id),
-                                    "shop_lvl")
+        full_user_key = db.join_key(ctx, "utenti", str(ctx.author.id), "casa")
 
-        user_shop_lvl = db.get_value(ctx, full_user_key)
+        user_shop_lvl = db.get_value(full_user_key)
         print(user_shop_lvl)
         if user_shop_lvl == None:
             await feedback.reply_with_err_msg(
@@ -176,7 +171,7 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="imposta_casa")
     async def set_user_shop_lvl(self, ctx, shop_lvl):
-        full_user_key = db.join_key(ctx, "users", str(ctx.author.id),
+        full_user_key = db.join_key(ctx, "utenti", str(ctx.author.id),
                                     "shop_lvl")
         db.set(full_user_key, shop_lvl, True)
         await feedback.reply_with_success_msg(
