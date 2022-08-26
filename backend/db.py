@@ -1,5 +1,4 @@
 from replit import db
-import discord_helper
 
 KEY_PART_SEPARATOR = "."
 
@@ -8,9 +7,14 @@ def split_key(key: str) -> list():
     return key.split(sep=KEY_PART_SEPARATOR)
 
 
-def join_key(ctx, *key_parts) -> list():
-    key_parts.insert(0, ctx.guild.id)
-    return KEY_PART_SEPARATOR.join(key_parts)
+def join_key(ctx, *key_parts) -> str:
+    if key_parts == (None, ):
+        return str(ctx.guild.id)
+    else:
+        key_parts = [str(ctx.guild.id), *key_parts]
+        key = KEY_PART_SEPARATOR.join(key_parts)
+        print(key)
+        return key
 
 
 class search_info:

@@ -5,7 +5,6 @@ import backend.db as db
 
 class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     ''''''
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -13,13 +12,10 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
         '''controllo per i comandi di questa classe, se ritorna True, il comando può essere eseguito'''
         return ctx.author.id == self.bot.author_id or ctx.author.id in self.bot.owner_ids
 
-    @commands.command(
-        name="db_agg",
-        aliases=["db_add"]
-    )
+    @commands.command(name="db_agg", aliases=["db_add"])
     async def db_add(self, ctx, key, value):
         ''' Aggiunge un campo ad database '''
-        db.join_key(ctx, key)
+        key = db.join_key(ctx, key)
         if db.contains(key):
             await feedback.reply_with_err_msg(
                 ctx, f"esiste già una chiave `{key}` nel database!\n" +
@@ -31,13 +27,10 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
                 f"aggiunto con successo al database la coppia chiave, valore:\n`{key}`: `{value}`"
             )
 
-    @commands.command(
-        name='db_agg_sub',
-        aliases=['db_add_sub']
-    )
+    @commands.command(name='db_agg_sub', aliases=['db_add_sub'])
     async def db_add_sub(self, ctx, key):
         ''' Aggiunge una categoria ad database '''
-        db.join_key(ctx, key)
+        key = db.join_key(ctx, key)
         if db.contains(key):
             await feedback.reply_with_err_msg(
                 ctx, f"esiste già una chiave `{key}` nel database!\n" +
@@ -52,7 +45,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     @commands.command(name='db_rim', aliases=['db_rem', 'db_del'])
     async def db_remove(self, ctx, key):
         ''' Rimuove un campo dal database '''
-        db.join_key(ctx, key)
+        key = db.join_key(ctx, key)
         if not db.contains(key):
             await feedback.reply_with_err_msg(
                 ctx, f"non esiste nessuna chiave `{key}` nel database!")
@@ -66,7 +59,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     )
     async def db_modify(self, ctx, key, value):
         ''' Modifica il valore di un campo del database '''
-        db.join_key(ctx, key)
+        key = db.join_key(ctx, key)
 
         if not db.contains(key):
             await feedback.reply_with_err_msg(
@@ -86,7 +79,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     async def db_append(self, ctx, key, value):
         ''' Appende del testo alla fine di un campo del database '''
 
-        db.join_key(ctx, key)
+        key = db.join_key(ctx, key)
         if not db.contains(key):
             await feedback.reply_with_err_msg(
                 ctx, f"non esiste nessuna chiave `{key}` nel database!\n" +
@@ -107,7 +100,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     async def db_append_start(self, ctx, key, value):
         ''' Appende del testo all'inizio di un campo del database '''
 
-        db.join_key(ctx, key)
+        key = db.join_key(ctx, key)
         if not db.contains(key):
             await feedback.reply_with_err_msg(
                 ctx, f"non esiste nessuna chiave `{key}` nel database!\n" +
@@ -126,7 +119,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     @commands.command(name='db_get')
     async def db_get(self, ctx, key):
         ''' Mostra il valore di un campo del database '''
-        db.join_key(ctx, key)
+        key = db.join_key(ctx, key)
 
         if not db.contains(key):
             await feedback.reply_with_err_msg(
@@ -141,7 +134,7 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     async def db_list(self, ctx, key=None):
         ''' Mostra tutti i campi del database accettati dalla chiave (opzionale) '''
 
-        db.join_key(ctx, key)
+        key = db.join_key(ctx, key)
 
         msg = "chiavi : tipo(valore)\n```css\n"
         list_res = db.get_all(key)
@@ -154,11 +147,16 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
 
     @commands.command(name='db_keys')
     async def db_keys(self, ctx, key=None):
-        db.join_key(ctx, key)
-
         ''' Mostra tutte le chiavi del database accettate dalla chiave (opzionale) '''
+        key = db.join_key(ctx, key)
+
+        list_res = db.get_all(key)
+
         msg = "chiavi\n```css\n"
-        msg += "\n".join([db.get_all(key).keys()])
+        if len(list_res) > 0:
+            msg += "\n".join([k for k, v in list_res])
+        else:
+            msg += "nessuna chiave trovata"
         msg += "\n```"
 
         await feedback.reply_with_msg(ctx, msg)
@@ -167,8 +165,8 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
     async def db_move(self, ctx, key_from, key_to):
         ''' Sposta un campo o una intera categoria del database '''
 
-        db.join_key(ctx, key_from)
-        db.join_key(ctx, key_to)
+        key_from = db.join_key(ctx, key_from)
+        key_to = db.join_key(ctx, key_to)
 
         if not db.contains(key_from):
             await feedback.reply_with_err_msg(
@@ -177,15 +175,20 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
 
         if db.contains(key_to):
             await feedback.reply_with_err_msg(
-                ctx, f"esiste già un campo `{key_to}` nel database!, usa `!db_remove {key_to}` per rimuoverlo")
+                ctx,
+                f"esiste già un campo `{key_to}` nel database!, usa `!db_remove {key_to}` per rimuoverlo"
+            )
             return
 
         if db.move(key_from, key_to):
             await feedback.reply_with_success_msg(
-                ctx, f"spostato con successo il campo `{key_from}` in `{key_to}`")
+                ctx,
+                f"spostato con successo il campo `{key_from}` in `{key_to}`")
         else:
             await feedback.reply_with_err_msg(
-                ctx, f"non è stato possibile spostare il campo `{key_from}` in `{key_to}`")
+                ctx,
+                f"non è stato possibile spostare il campo `{key_from}` in `{key_to}`"
+            )
 
 
 def setup(bot):
