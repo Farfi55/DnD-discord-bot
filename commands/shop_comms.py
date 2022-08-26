@@ -39,6 +39,7 @@ unavaliable_on_buy_shops = [lvl1, lvl2, lvl3]
 
 class ShopCommands(commands.Cog, name='Comandi mercati'):
     ''''''
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -193,12 +194,31 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
         if (shop.buy_item(ctx, shop_name, item_name, set_unavailable)):
             await feedback.reply_with_success_msg(
-                ctx, f"Hai comprato {item_name} da {shop_name}!")
+                ctx, f"{ctx.author} ha comprato {item_name} da {shop_name}!")
+
+            shop_channel = db.get_value(db.join_key(ctx, "canale", "mercato"))
+            if(shop_channel != None):
+                await feedback.reply_with_msg(
+                    ctx, f"{ctx.author} ha comprato {item_name} da {shop_name}!", channel=shop_channel)
+            else:
+                await feedback.reply_with_info_msg(ctx, f"usa `{ctx.prefix}imposta_canale` per impostare il canale del mercato")
         else:
             await feedback.reply_with_err_msg(
                 ctx,
                 f"{item_name} non è presente dentro {shop_name} o non è disponibile"
             )
+
+    @commands.command(name="imposta_canale_mercato")
+    async def set_shop_channel(self, ctx):
+        channel_key = db.join_key(ctx, "canale", "mercato")
+
+        id_channel = str(ctx.channel.id)
+        if db.set(channel_key, id_channel, True):
+            await feedback.reply_with_success_msg(
+                ctx, f"il canale {ctx.channel} è ora il canale di mercato")
+        else:
+            await feedback.reply_with_err_msg(
+                ctx, f"non è stato possibile impostare il canale di mercato")
 
 
 def setup(bot):

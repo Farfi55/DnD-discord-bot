@@ -7,14 +7,17 @@ info_msg_prefix = "🔵 info: "
 success_msg_prefix = "🟢 successo: "
 
 
-async def reply_with_msg(ctx, message):
+async def reply_with_msg(ctx, message, channel=None):
     chunklength = 2000
     msg_chunks = [
         message[i:i + chunklength] for i in range(0, len(message), chunklength)
     ]
 
     for msg_chunk in msg_chunks:
-        await ctx.send(msg_chunk)
+        if channel == None:
+            await ctx.send(msg_chunk)
+        else:
+            await channel.send(msg_chunk)
 
 
 async def private_reply_with_msg(ctx, message):
