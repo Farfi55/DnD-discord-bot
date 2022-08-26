@@ -198,12 +198,15 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
             await feedback.reply_with_success_msg(
                 ctx, f"{ctx.author} ha comprato {item_name} da {shop_name}!")
 
-            shop_channel = db.get_value(db.join_key(ctx, "canale", "mercato"))
-            if(shop_channel != None):
+            shop_channel_id = db.get_value(
+                db.join_key(ctx, "canali", "mercato"))
+
+            if(shop_channel_id != None):
+                shop_channel = self.bot.get_channel(int(shop_channel_id))
                 await feedback.reply_with_msg(
                     ctx, f"{ctx.author} ha comprato {item_name} da {shop_name}!", channel=shop_channel)
             else:
-                await feedback.reply_with_info_msg(ctx, f"usa `{ctx.prefix}imposta_canale` per impostare il canale del mercato")
+                await feedback.reply_with_info_msg(ctx, f"usa `{ctx.prefix}imposta_canale_mercato` per impostare il canale del mercato")
         else:
             await feedback.reply_with_err_msg(
                 ctx,
@@ -212,7 +215,7 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="imposta_canale_mercato")
     async def set_shop_channel(self, ctx):
-        channel_key = db.join_key(ctx, "canale", "mercato")
+        channel_key = db.join_key(ctx, "canali", "mercato")
 
         id_channel = str(ctx.channel.id)
         if db.set(channel_key, id_channel, True):
