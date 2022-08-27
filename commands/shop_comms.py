@@ -39,7 +39,6 @@ unavaliable_on_buy_shops = [lvl1, lvl2, lvl3]
 
 class ShopCommands(commands.Cog, name='Comandi mercati'):
     ''''''
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -61,6 +60,7 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="breacher")
     async def get_breacher_shop_items(self, ctx):
+        """Gli oggetti possono essere acquistati solo 1 volta ma è possibile che più giocatori acquistino lo stesso oggetto. Il sito di riferimento per molti degli oggetti è https://www.dandwiki.com/wiki/5e_Cursed_Items"""
         random_items = shop.get_random_shop_items(ctx, "breacher", 10)
         if random_items == None:
             await feedback.reply_with_err_msg(
@@ -140,7 +140,7 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
         msg += "\n".join(shop_items_avariable)
         msg += "```"
 
-        if len(shop_items_avariable) > 0:
+        if len(shop_items_unavariable) > 0:
             msg += f"\noggetti non disponibili del mercato {shop_name}:\n```css\n"
             msg += "\n".join(shop_items_unavariable)
             msg += "```"
@@ -185,7 +185,15 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="rimpiazza", alias=["replace"])
     async def set_shop_items(self, ctx, shop_name, items):
+        """Usami per sostituire gli oggetti """
         shop.clear_shop_items(ctx, shop_name)
+        shop.add_shop_items_from_str(ctx, shop_name, items)
+        await feedback.reply_with_success_msg(
+            ctx, f"oggetti del mercato {shop_name} aggiornati")
+
+    @commands.command(name="aggiungi", alias=["add_items"])
+    async def add_shop_items(self, ctx, shop_name, items):
+        """Usami se gli oggetti occupano più caratteri del previsto"""
         shop.add_shop_items_from_str(ctx, shop_name, items)
         await feedback.reply_with_success_msg(
             ctx, f"oggetti del mercato {shop_name} aggiornati")
@@ -201,12 +209,17 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
             shop_channel_id = db.get_value(
                 db.join_key(ctx, "canali", "mercato"))
 
-            if(shop_channel_id != None):
+            if (shop_channel_id != None):
                 shop_channel = self.bot.get_channel(int(shop_channel_id))
                 await feedback.reply_with_msg(
-                    ctx, f"{ctx.author} ha comprato {item_name} da {shop_name}!", channel=shop_channel)
+                    ctx,
+                    f"{ctx.author} ha comprato {item_name} da {shop_name}!",
+                    channel=shop_channel)
             else:
-                await feedback.reply_with_info_msg(ctx, f"usa `{ctx.prefix}imposta_canale_mercato` per impostare il canale del mercato")
+                await feedback.reply_with_info_msg(
+                    ctx,
+                    f"usa `{ctx.prefix}imposta_canale_mercato` per impostare il canale del mercato"
+                )
         else:
             await feedback.reply_with_err_msg(
                 ctx,
@@ -217,6 +230,7 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
     async def set_shop_channel(self, ctx):
         channel_key = db.join_key(ctx, "canali", "mercato")
 
+        print(ctx.channel, ctx.channel.id)
         id_channel = str(ctx.channel.id)
         if db.set(channel_key, id_channel, True):
             await feedback.reply_with_success_msg(

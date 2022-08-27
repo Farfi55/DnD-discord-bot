@@ -177,7 +177,7 @@ def add(full_key, value):
 def replace(full_key, to_replace: str, replace_with: str):
 
     val = str(get_value(full_key))
-    val.replace(to_replace, replace_with)
+    val = val.replace(to_replace, replace_with)
     set(full_key, val)
 
 

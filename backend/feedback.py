@@ -20,6 +20,14 @@ async def reply_with_msg(ctx, message, channel=None):
             await channel.send(msg_chunk)
 
 
+async def reply_with_embed_msg(ctx, embed, channel=None):
+
+    if channel == None:
+        await ctx.send(embed=embed)
+    else:
+        await channel.send(embed=embed)
+
+
 async def private_reply_with_msg(ctx, message):
     await ctx.author.send(message)
 

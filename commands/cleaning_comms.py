@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import backend.feedback as feedback
 
 
 class CleaningCommands(commands.Cog, name='Comandi misti'):
@@ -15,6 +16,16 @@ class CleaningCommands(commands.Cog, name='Comandi misti'):
     @commands.command(name='clear', aliases=['wipe'])
     async def clear(self, ctx):
         await ctx.channel.purge(limit=5000)
+
+    @commands.command(name='test')
+    async def embed(ctx):
+        embed = discord.Embed(
+            title="Sample Embed",
+            url="https://realdrewdata.medium.com/",
+            description=
+            "This is an embed that will show how to build an embed and the different components",
+            color=0xFF5733)
+        await feedback.reply_with_embed_msg(ctx, embed)
 
 
 def setup(bot):
