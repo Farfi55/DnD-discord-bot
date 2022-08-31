@@ -29,6 +29,9 @@ breacher = "breacher"
 commom_chest = "common_chest"
 uncommon_chest = "uncommon_chest"
 rare_chest = "rare_chest"
+common_uncommon_chest = "common_uncommon_chest"
+common_uncommon_rare_chest = "common_uncommon_rare_chest"
+
 
 lvl1_shops = [lvl1, breacher, commom_chest, uncommon_chest, rare_chest]
 lvl2_shops = [lvl2, *lvl1_shops]
@@ -44,7 +47,7 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     async def cog_check(self, ctx):
         '''controllo per i comandi di questa classe, se ritorna True, il comando può essere eseguito'''
-        return ctx.author.id == self.bot.author_id or ctx.author.id in self.bot.owner_ids
+        return True
 
     @commands.command(name="lvl1")
     async def get_lvl1_shop_items(self, ctx):
@@ -90,7 +93,8 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="uncommon_chest", alias=["UncChest"])
     async def get_uncommon_chest_items(self, ctx):
-        random_items = shop.get_random_shop_items(ctx, "uncommon_chest", 3)
+        random_items = shop.get_random_shop_items(ctx, "uncommon_chest", 1)
+        random_items += shop.get_random_shop_items(ctx, "common_uncommon_chest", 1)
         if random_items == None:
             await feedback.reply_with_err_msg(
                 ctx,
@@ -106,7 +110,8 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
 
     @commands.command(name="rare_chest", alias=["RarChest"])
     async def get_rare_chest_items(self, ctx):
-        random_items = shop.get_random_shop_items(ctx, "rare_chest", 10)
+        random_items = shop.get_random_shop_items(ctx, "rare_chest", 1)
+        random_items += shop.get_random_shop_items(ctx, "common_uncommon_rare_chest", 1)
         if random_items == None:
             await feedback.reply_with_err_msg(
                 ctx,
