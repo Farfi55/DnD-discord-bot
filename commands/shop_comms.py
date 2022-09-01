@@ -17,6 +17,7 @@
 # 🔴 indica acquistato
 
 from discord.ext import commands
+from discord import Embed
 import backend.shop as shop
 import backend.db as db
 import backend.feedback as feedback
@@ -42,6 +43,7 @@ unavaliable_on_buy_shops = [lvl1, lvl2, lvl3]
 
 class ShopCommands(commands.Cog, name='Comandi mercati'):
     ''''''
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -64,17 +66,19 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
     @commands.command(name="breacher")
     async def get_breacher_shop_items(self, ctx):
         """Gli oggetti possono essere acquistati solo 1 volta ma è possibile che più giocatori acquistino lo stesso oggetto. Il sito di riferimento per molti degli oggetti è https://www.dandwiki.com/wiki/5e_Cursed_Items"""
+
         random_items = shop.get_random_shop_items(ctx, "breacher", 10)
         if random_items == None:
             await feedback.reply_with_err_msg(
                 ctx, f"non è stato possibile prendere gli item dal breacher")
             return
+        descrizione = "descrizione\n"
+        e = Embed(title="Items del breacher", description=descrizione)
+        for i, item in enumerate(random_items, start=1):
+            e.add_field(name=f"item {i}" value=f"{item}" inline=False)
+        e.set_image(url="https://i.imgur.com/dDfL29o.jpeg")
 
-        msg = "Items del breacher\n```css\n"
-        msg += "\n".join(
-            [f"{i}: {item}" for i, item in enumerate(random_items, start=1)])
-        msg += "\n```"
-        await feedback.reply_with_success_msg(ctx, msg)
+        await feedback.reply_with_embed_msg(ctx, e)
 
     @commands.command(name="common_chest", alias=["ComChest"])
     async def get_common_chest_items(self, ctx):
@@ -94,7 +98,8 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
     @commands.command(name="uncommon_chest", alias=["UncChest"])
     async def get_uncommon_chest_items(self, ctx):
         random_items = shop.get_random_shop_items(ctx, "uncommon_chest", 1)
-        random_items += shop.get_random_shop_items(ctx, "common_uncommon_chest", 1)
+        random_items += shop.get_random_shop_items(
+            ctx, "common_uncommon_chest", 1)
         if random_items == None:
             await feedback.reply_with_err_msg(
                 ctx,
@@ -111,7 +116,8 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
     @commands.command(name="rare_chest", alias=["RarChest"])
     async def get_rare_chest_items(self, ctx):
         random_items = shop.get_random_shop_items(ctx, "rare_chest", 1)
-        random_items += shop.get_random_shop_items(ctx, "common_uncommon_rare_chest", 1)
+        random_items += shop.get_random_shop_items(
+            ctx, "common_uncommon_rare_chest", 1)
         if random_items == None:
             await feedback.reply_with_err_msg(
                 ctx,
