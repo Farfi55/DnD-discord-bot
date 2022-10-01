@@ -24,12 +24,12 @@ class DevCommands(commands.Cog, name='Commands sviluppatore'):
         extensions = self.bot.extensions  # A list of the bot's cogs/extensions.
         if cog == 'all':  # Lets you reload all cogs at once
             for extension in extensions:
-                self.bot.unload_extension(cog)
-                self.bot.load_extension(cog)
+                await self.bot.unload_extension(cog)
+                await self.bot.load_extension(cog)
             await ctx.send('Done')
         if cog in extensions:
-            self.bot.unload_extension(cog)  # Unloads the cog
-            self.bot.load_extension(cog)  # Loads the cog
+            await self.bot.unload_extension(cog)  # Unloads the cog
+            await self.bot.load_extension(cog)  # Loads the cog
             await ctx.send('Done')  # Sends a message where content='Done'
         else:
             await ctx.send('Unknown Cog')  # If the cog isn't found/loaded.
@@ -43,7 +43,7 @@ class DevCommands(commands.Cog, name='Commands sviluppatore'):
         if cog not in extensions:
             await ctx.send("Cog is not loaded!")
             return
-        self.bot.unload_extension(cog)
+        await self.bot.unload_extension(cog)
         await ctx.send(f"`{cog}` has successfully been unloaded.")
 
     @commands.command(name="load")
@@ -53,7 +53,7 @@ class DevCommands(commands.Cog, name='Commands sviluppatore'):
         '''
         try:
 
-            self.bot.load_extension(cog)
+            await self.bot.load_extension(cog)
             await ctx.send(f"`{cog}` has successfully been loaded.")
 
         except commands.errors.ExtensionNotFound:
@@ -70,5 +70,5 @@ class DevCommands(commands.Cog, name='Commands sviluppatore'):
         await ctx.send(base_string)
 
 
-def setup(bot):
-    bot.add_cog(DevCommands(bot))
+async def setup(bot):
+    await bot.add_cog(DevCommands(bot))

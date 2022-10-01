@@ -28,5 +28,5 @@ class CleaningCommands(commands.Cog, name='Comandi misti'):
         await feedback.reply_with_embed_msg(ctx, embed)
 
 
-def setup(bot):
-    bot.add_cog(CleaningCommands(bot))
+async def setup(bot):
+    await bot.add_cog(CleaningCommands(bot))

@@ -195,5 +195,5 @@ class DataBaseCommands(commands.Cog, name='Comandi DataBase'):
             )
 
 
-def setup(bot):
-    bot.add_cog(DataBaseCommands(bot))
+async def setup(bot):
+    await bot.add_cog(DataBaseCommands(bot))

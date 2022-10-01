@@ -33,7 +33,6 @@ rare_chest = "rare_chest"
 common_uncommon_chest = "common_uncommon_chest"
 common_uncommon_rare_chest = "common_uncommon_rare_chest"
 
-
 lvl1_shops = [lvl1, breacher, commom_chest, uncommon_chest, rare_chest]
 lvl2_shops = [lvl2, *lvl1_shops]
 lvl3_shops = [lvl3, *lvl2_shops]
@@ -43,7 +42,6 @@ unavaliable_on_buy_shops = [lvl1, lvl2, lvl3]
 
 class ShopCommands(commands.Cog, name='Comandi mercati'):
     ''''''
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -75,7 +73,7 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
         descrizione = "descrizione\n"
         e = Embed(title="Items del breacher", description=descrizione)
         for i, item in enumerate(random_items, start=1):
-            e.add_field(name=f"item {i}" value=f"{item}" inline=False)
+            e.add_field(name=f"item {i}", value=f"{item}", inline=False)
         e.set_image(url="https://i.imgur.com/dDfL29o.jpeg")
 
         await feedback.reply_with_embed_msg(ctx, e)
@@ -98,8 +96,8 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
     @commands.command(name="uncommon_chest", alias=["UncChest"])
     async def get_uncommon_chest_items(self, ctx):
         random_items = shop.get_random_shop_items(ctx, "uncommon_chest", 1)
-        random_items += shop.get_random_shop_items(
-            ctx, "common_uncommon_chest", 1)
+        random_items += shop.get_random_shop_items(ctx,
+                                                   "common_uncommon_chest", 1)
         if random_items == None:
             await feedback.reply_with_err_msg(
                 ctx,
@@ -251,5 +249,5 @@ class ShopCommands(commands.Cog, name='Comandi mercati'):
                 ctx, f"non è stato possibile impostare il canale di mercato")
 
 
-def setup(bot):
-    bot.add_cog(ShopCommands(bot))
+async def setup(bot):
+    await bot.add_cog(ShopCommands(bot))
